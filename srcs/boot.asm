@@ -42,8 +42,8 @@ global _start:function (_start.end - _start)
 _start:
 	mov esp, stack_top; creation de la stack
 	call kernel_main; call du point d'entree du kernel
-	cli; empeche les interruptions de survenir jusqu'a ce que l'instruction STI soit rencontree
-.halt:  hlt; mais le kernel dans un etat en suspension
+	cli; pour Clear Interrupt : empeche les interruptions de survenir jusqu'a ce que l'instruction STI soit rencontree
+.halt:  hlt; met le kernel dans un etat en suspension
 	jmp .halt; loop infinie dans l'etat en suspension
 .end:
 
