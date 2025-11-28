@@ -75,7 +75,11 @@ void putchar(char c)
 void putstr(char *str)
 {
     size_t i = 0;
-    while (str[i++]) putchar(str[i]);
+    while (str[i])
+    {
+	putchar(str[i]);
+	i++;
+    }
 }
 
 void init_terminal(void)
@@ -102,5 +106,5 @@ void set_terminal_color(uint8_t color)
 void kernel_main(void)
 {
     init_terminal();
-    putstr("KernelYo.\n");
+    putstr("KKernelYo.\n");
 }
