@@ -1,5 +1,12 @@
 # KFS 1
 
+## Structuration du projet
+
+- `sysroot` est la base du kernel, on retrouvera dedans l'ensemble des differents fichiers.
+- `sysroot/usr/lib` : emplacement pour les librairies
+- `sysroot/usr/include` : emplacement pour les headers
+- `sysroot/boot` : l'emplacement pour le kernel
+
 ## Directives NASM d'initialisation de données
 
 | Directive | Description | Taille | Exemple |
