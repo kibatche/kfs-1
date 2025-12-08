@@ -8,7 +8,7 @@ MEMINFO equ 1<<1
 FLAGS equ MBALIGN | MEMINFO
 ; Nombre magique qui permet au chargeur d'armorcage de trouver l'en-tete
 MAGIC equ 0x1BADB002
-; somme d everification des donnees ci-dessus, pour prouver que nous sommes en multiboo
+; somme de verification des donnees ci-dessus, pour prouver que nous sommes en multiboo
 CHECKSUM equ -(MAGIC + FLAGS)
 
 ; Declare un en-tete multiboot qui marque le programme comme etant un kernel

@@ -48,7 +48,7 @@ int terminal_putchar(char c)
 int terminal_write(const char *str, size_t len)
 {
     int i = 0;
-    while(str[i] && i < len)
+    while(str[i] && i < (int)len)
     {
         terminal_putchar(str[i]);
         i++;

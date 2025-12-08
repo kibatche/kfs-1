@@ -4,5 +4,5 @@
 void kernel_main(void)
 {
     terminal_init();
-    puts("KKernelYo.\n");
+    printf("42\n");
 }

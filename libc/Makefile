@@ -6,7 +6,7 @@ RM = rm -f
 SRCS_STRING = string/memchr.c string/memcpm.c string/memcpy.c string/memmove.c string/memset.c \
 	      string/strchr.c string/strcmp.c string/strcpy.c string/strlen.c
 
-SRCS_STDIO = stdio/putchar.c stdio/puts.c
+SRCS_STDIO = stdio/putchar.c stdio/puts.c stdio/printf.c
 
 SRCS_UNISTD = unistd/write.c
 

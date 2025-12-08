@@ -16,39 +16,44 @@ RM=rm -rf
 INCLUDE = -I ./kernel/include -I ./libc/include
 
 
-LIB = -lgcc -L./libc -lk
+LIB = -L./libc -lk -lgcc
 
 PREFIX = kernel/kernel
 PREFIX_ASM = ${PREFIX}/assembly
 
-SRCS_C = ${PREFIX}/kernel.c
+SRCS_C = ${PREFIX}/kernel.c kernel/tty/tty.c
 SRCS_ASM = ${PREFIX_ASM}/boot.asm
 
 OBJS_C=${SRCS_C:.c=.o}
 OBJS_ASM=${SRCS_ASM:.asm=.o}
 
-LINK= -T ./kernel/linker.ld
+LINK=-T ./kernel/linker.ld
 
 NAME=kernel.bin
+
+LIB_EXE=libk.a
 
 all: ${LIB_EXE} ${NAME}
 
 ${LIB_EXE}:
-	@make -C libc
+	${MAKE} -C libc
 
 ${NAME}: ${OBJS_C} ${OBJS_ASM}
-	${GCC} ${CFLAGS}  ${OBJS} ${LINK} -o ${NAME} ${INCLUDE} ${LIB}
-
+	${GCC} ${CFLAGS}  ${OBJS_C} ${OBJS_ASM} ${LINK} -o ${NAME} ${INCLUDE} ${LIB}
 %.o: %.c
 	${GCC} ${CFLAGS} -c $< -o $@ ${INCLUDE}
+
 
 %.o: %.asm
 	${NASM} ${NASM_FLAGS} $< -o $@
 
 clean:
-	${RM} ${OBJS}
-	@make -C libc clean
+	${RM} ${OBJS_C} ${OBJS_ASM}
+	${MAKE} -C libc clean
 
 fclean: clean
 	${RM} ${NAME}
-	@make -C libc fclean
+	${MAKE} -C libc fclean
+
+re: fclean all
+.PHONY: fclean clean all re
