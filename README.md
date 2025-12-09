@@ -2,10 +2,57 @@
 
 ## Structuration du projet
 
-- `sysroot` est la base du kernel, on retrouvera dedans l'ensemble des differents fichiers.
-- `sysroot/usr/lib` : emplacement pour les librairies
-- `sysroot/usr/include` : emplacement pour les headers
-- `sysroot/boot` : l'emplacement pour le kernel
+- Le dossier `kernel` contient les fichiers propres au kernel. Exemple : driver, écriture sur le terminal etc.
+- Le dossier `libc` contient un début de librairie C. Les implémentations ne sont pas standard pour la plupart.
+- Le Makefile principal archive la libc en `libk` ("libkernel"), puis ensuite le kernel en `kernel.bin`
+- Ensuite, il archive sous forme d'iso le kernel, avec le fichier grub pour loader le kernel.
+- Pour terminer, qemu est utilisé afin d'émuler notre kernel.
+
+```bash
+.
+├── grub.cfg
+├── kernel
+│   ├── include
+│   │   ├── tty.h
+│   │   └── vga.h
+│   ├── kernel
+│   │   ├── assembly
+│   │   │   └── boot.asm
+│   │   └── kernel.c
+│   ├── linker.ld
+│   └── tty
+│       └── tty.c
+├── libc
+│   ├── include
+│   │   ├── _itoa.h
+│   │   ├── stdio.h
+│   │   ├── string.h
+│   │   └── unistd.h
+│   ├── _itoa
+│   │   ├── _itoa.c
+│   │   ├── _uitoa_base.c
+│   │   └── _uitoa.c
+│   ├── Makefile
+│   ├── stdio
+│   │   ├── printf.c
+│   │   ├── putchar.c
+│   │   └── puts.c
+│   ├── string
+│   │   ├── bzero.c
+│   │   ├── memchr.c
+│   │   ├── memcpm.c
+│   │   ├── memcpy.c
+│   │   ├── memmove.c
+│   │   ├── memset.c
+│   │   ├── strchr.c
+│   │   ├── strcmp.c
+│   │   ├── strcpy.c
+│   │   └── strlen.c
+│   └── unistd
+│       └── write.c
+├── Makefile
+└── README.md
+```
 
 ## Directives NASM d'initialisation de données
 
