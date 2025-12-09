@@ -1,5 +1,13 @@
 #include <string.h>
 
+/**
+ * @brief Copie len octets de src dans dst en acceptant le chevauchement.
+ * 
+ * @param dst 
+ * @param src 
+ * @param len 
+ * @return void* 
+ */
 void	*memmove(void *dst, const void *src, size_t len)
 {
 	char		*dst_cpy;

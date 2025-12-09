@@ -1,5 +1,12 @@
 #include <string.h>
 
+/**
+ * @brief Cherche l'int c dans la string s et retourne un pointeur sur le caractère trouvé, s'il est trouvé, sinon retourne NULL.
+ * 
+ * @param s 
+ * @param c 
+ * @return char* 
+ */
 char	*strchr(const char *s, int c)
 {
 	char	c_py;

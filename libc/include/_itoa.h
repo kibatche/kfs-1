@@ -1,9 +1,10 @@
-#ifndef __ITOA_H
-# define __ITOA_H
+#ifndef _ITOA_H
+# define _ITOA_H
 
 #include <string.h>
 
-const char *_itoa_base(long long n, int base, int caps);
-const char *_itoa(long long n);
+const char *_itoa(long n);
+const char *_uitoa(unsigned int n);
+const char *_uitoa_base(unsigned int n, int base, int capslock);
 
 #endif

@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+void bzero(void *b, size_t len);
+
 void    *memset(void *dst, int c, size_t len);
 void    *memcpy(void *dst, const void *src, size_t len);
 void    *memmove(void *dst, const void *src, size_t len);

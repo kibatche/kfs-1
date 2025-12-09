@@ -1,5 +1,12 @@
 #include <string.h>
 
+/**
+ * @brief Compare s1 et s2 et retourne la différence.
+ * 
+ * @param s1 
+ * @param s2 
+ * @return int 
+ */
 int	strcmp(const char *s1, const char *s2)
 {
 	size_t			i;

@@ -2,45 +2,37 @@
 #include <string.h>
 #include <_itoa.h>
 
-/**
- * Imprime selon le type choisi (int, unsigned int, hexadécimal minuscule, héxadémal majuscule)
- * l'argument sous forme de tableau de caractères.
-**/
 
+
+/**
+ * @brief Imprime selon le format choisi (int, unsigned int, hexadécimal minuscule, héxadémal majuscule, char[], char)
+ * l'argument sous forme de tableau de caractères.
+ *
+ * @param s 
+ * @param args 
+ * @return int 
+ */
 static int print(const char *s, va_list args)
 {
     switch(*(s + 1))
     {
     case 'd':
-        return puts(_itoa_base(va_arg(args, int), 10, 0));
+        return puts(_itoa(va_arg(args, int)));
         break;
     case 'u':
-        int a = va_arg(args, int);
-        if (a < 0)
-            return puts(_itoa_base(a + 1 + 4294967295, 10, 0));
-        else
-            return puts(_itoa_base(a, 10, 0));
+        return puts(_uitoa(va_arg(args, unsigned int)));
         break;
     case 'x':
-        int b = va_arg(args, int);
-        if (b < 0)
-            return puts(_itoa_base(b + 1 + 4294967295, 16, 0));
-        else
-            return puts(_itoa_base(b, 16, 0));
+        return puts(_uitoa_base(va_arg(args, unsigned int), 16, 0));
         break;
     case 'X':
-        int c = va_arg(args, int);
-        if (c < 0)
-            return puts(_itoa_base(c + 1 + 4294967295, 16, 1));
-        else
-            return puts(_itoa_base(c, 16, 0));
+        return puts(_uitoa_base(va_arg(args, unsigned int), 16, 1));
         break;
     case 's':
         char *str = va_arg(args, char *);
         if (str)
             return puts(str);
-        else
-            return puts("(null)");
+        return puts("(null)");
         break;
     case 'c':
         return putchar(va_arg(args, int));
@@ -53,6 +45,13 @@ static int print(const char *s, va_list args)
     }
 }
 
+/**
+ * @brief Cette fonction imprime un type (int, unsigned int, char *, c) selon la forme désirée.
+ * 
+ * @param s 
+ * @param ... 
+ * @return int 
+ */
 int printf(const char *s, ...)
 {
     va_list args;
@@ -64,7 +63,7 @@ int printf(const char *s, ...)
     while (*s)
     {
         if (*s == '%')
-            print(s, args);
+            print(s++, args);
         else
             putchar(*s);
         s++;

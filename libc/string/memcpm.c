@@ -1,26 +1,26 @@
 #include <string.h>
 
-void	*memmove(void *dst, const void *src, size_t len)
+/**
+ * @brief Compare b1 et b2 pendant len octets et retourne la différence.
+ * 
+ * @param dst 
+ * @param src 
+ * @param len 
+ * @return void* 
+ */
+int	ft_memcmp(const void *b1, const void *b2, size_t len)
 {
-	char		*dst_cpy;
-	const char	*src_cpy;
-	int			i;
+	unsigned char	*b1_cpy;
+	unsigned char	*b2_cpy;
 
-	if (dst == NULL && src == NULL)
-		return (NULL);
-	dst_cpy = (char *)dst;
-	src_cpy = (const char *)src;
-	if (src_cpy < dst_cpy)
+	b1_cpy = (unsigned char *)b1;
+	b2_cpy = (unsigned char *)b2;
+	if (len == 0)
+		return (0);
+	while (--len && *b1_cpy == *b2_cpy)
 	{
-		i = (int)len;
-		while (i--)
-			*(dst_cpy + i) = *(src_cpy + i);
+		b1_cpy++;
+		b2_cpy++;
 	}
-	else
-	{
-		i = -1;
-		while (++i < (int)len)
-			*(dst_cpy + i) = *(src_cpy + i);
-	}
-	return (dst);
+	return ((int)(*b1_cpy - *b2_cpy));
 }

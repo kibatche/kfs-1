@@ -3,7 +3,7 @@ AR = i386-elf-ar
 CCFLAGS = -c -Wall -Wextra -std=gnu99 -ffreestanding -nostdlib -nodefaultlibs
 RM = rm -f
 
-SRCS_ITOA = _itoa/_itoa.c _itoa/_itoa_base.c
+SRCS_ITOA = _itoa/_itoa.c _itoa/_uitoa.c _itoa/_uitoa_base.c
 
 SRCS_STRING = string/bzero.c string/memchr.c string/memcpm.c string/memcpy.c string/memmove.c string/memset.c \
 	      string/strchr.c string/strcmp.c string/strcpy.c string/strlen.c

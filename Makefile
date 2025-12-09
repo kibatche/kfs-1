@@ -31,9 +31,11 @@ LINK=-T ./kernel/linker.ld
 
 NAME=kernel.bin
 
+NAME_ISO = kernel.iso
+
 LIB_EXE=libk.a
 
-all: ${LIB_EXE} ${NAME}
+all: ${LIB_EXE} ${NAME} ${NAME_ISO}
 
 ${LIB_EXE}:
 	${MAKE} -C libc
@@ -47,12 +49,18 @@ ${NAME}: ${OBJS_C} ${OBJS_ASM}
 %.o: %.asm
 	${NASM} ${NASM_FLAGS} $< -o $@
 
+${NAME_ISO}:
+	@mkdir -p iso/boot/grub
+	@cp grub.cfg iso/boot/grub
+	@cp kernel.bin iso/boot
+	@grub-mkrescue -o kernel.iso iso
+	@qemu-system-i386 -cdrom kernel.iso
 clean:
 	${RM} ${OBJS_C} ${OBJS_ASM}
 	${MAKE} -C libc clean
 
 fclean: clean
-	${RM} ${NAME}
+	${RM} ${NAME} ${NAME_ISO} iso
 	${MAKE} -C libc fclean
 
 re: fclean all

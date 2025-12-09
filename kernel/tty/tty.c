@@ -61,11 +61,14 @@ void terminal_set_cursor(bool newline)
     if (newline == true)
     {
         terminal_col = 0;
+        if (++terminal_row == VGA_HEIGTH)
+            terminal_row = 0;
         return;
     }
     if (++terminal_col == VGA_WIDTH) {
-	terminal_col  = 0;
-	if (++terminal_row == VGA_HEIGTH) terminal_row = 0;
+	    terminal_col  = 0;
+	    if (++terminal_row == VGA_HEIGTH)
+            terminal_row = 0;
     }
 }
 

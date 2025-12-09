@@ -1,5 +1,14 @@
 #include <string.h>
 
+/**
+ * @brief Chercher le int c dans le buffer b avec un taille de len. Retourne un pointeur sur le caracère trouvé si tel est le cas,
+ * sinon retourne NULL
+ * 
+ * @param b 
+ * @param c 
+ * @param len 
+ * @return void* 
+ */
 void	*memchr(const void *b, int c, size_t len)
 {
 	unsigned char	char_cpy;
