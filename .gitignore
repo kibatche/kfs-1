@@ -57,7 +57,5 @@ dkms.conf
 .swp
 
 iso/**
-.iso
-.bin
-
-obj/**
+*.iso
+*.bin
