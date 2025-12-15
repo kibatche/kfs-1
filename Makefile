@@ -1,71 +1,77 @@
-GCC = i386-elf-gcc
+.SUFFIXES:
+.SUFFIXES: .asm .c .h .o .ld
+
+RM = rm -rf
+
+NAME = uselOS
+NAME_BIN = ${NAME}.bin
+NAME_ISO = ${NAME}.iso
+
+ISO_DIR = iso
+LIBS = k gcc
+LIB_DIR = libk
+
+SRCS_C = kernel.c tty.c write.c
+SRCS_AS = boot.asm
+
+OBJ_DIR = obj
+OBJ_FILES = ${SRCS_C:.c=.o} ${SRCS_AS:.asm=.o}
+OBJS = $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
+
+VPATH = arch/i386/boot drivers/tty kernel fs
+
+AS = nasm
+ASFLAGS = -f elf
+
+CC = i386-elf-gcc
 #-02 : opitmisation; -g: debug
-CFLAGS=-O2 -g
+CFLAGS = -O2 -g
 CFLAGS += -Wall -Wextra
 #-std=gnu99: standard C gnu99; -ffreestanding : pas de std et point d'entree pas forcement main
 CFLAGS += -std=gnu99 -ffreestanding
-#-fno-builtin: pas de remplacement de fonction par des version GCC ; -fno-stack-protector: pas de protection de la stack
+#-fno-builtin: pas de remplacement de fonction par des versions GCC ; -fno-stack-protector: pas de protection de la stack
 CFLAGS += -fno-builtin -fno-stack-protector
 CFLAGS += -nostdlib -nodefaultlibs
+CPPFLAGS =  -I ./include/drivers/video -I ./include/fs -I ./include/drivers/tty -I ./libk/include -I ./arch/i386/include
 
-NASM=nasm
-NASM_FLAGS=-f elf
+LDFLAGS = -T ./arch/i386/linker.ld -L./${LIB_DIR}
+LDLIBS = $(foreach lib, $(LIBS), -l$(lib))
 
-RM=rm -rf
+.PHONY: install
+install:
+	${MAKE} -C ${LIB_DIR}
 
-INCLUDE = -I ./include/drivers/video -I ./include/fs -I ./include/drivers/tty -I ./libk/include -I ./arch/i386/include
+${OBJ_DIR}:
+	@mkdir -p $@
 
+${OBJ_DIR}/%.o: %.c
+	${CC} ${CPPFLAGS} ${CFLAGS} -c $< -o $@
 
-LIB = -L./libk -lk -lgcc
+${OBJ_DIR}/%.o: %.asm
+	${AS} ${ASFLAGS} $< -o $@
 
-PREFIX_BOOT = arch/i386/boot
-PREFIX_TTY = drivers/tty
-PREFIX_KERNEL = kernel
-PREFIX_FS = fs
-
-SRCS_C = ${PREFIX_KERNEL}/kernel.c
-SRCS_C += ${PREFIX_TTY}/tty.c
-SRCS_C += ${PREFIX_FS}/write.c
-SRCS_ASM = ${PREFIX_BOOT}/boot.asm
-
-OBJS_C=${SRCS_C:.c=.o}
-OBJS_ASM=${SRCS_ASM:.asm=.o}
-
-LINK=-T ./arch/i386/linker.ld
-
-NAME=kernel.bin
-
-NAME_ISO = kernel.iso
-
-LIB_EXE=libk.a
-
-all: ${LIB_EXE} ${NAME} ${NAME_ISO}
-
-${LIB_EXE}:
-	${MAKE} -C libk
-
-${NAME}: ${OBJS_C} ${OBJS_ASM}
-	${GCC} ${CFLAGS}  ${OBJS_C} ${OBJS_ASM} ${LINK} -o ${NAME} ${INCLUDE} ${LIB}
-%.o: %.c
-	${GCC} ${CFLAGS} -c $< -o $@ ${INCLUDE}
-
-
-%.o: %.asm
-	${NASM} ${NASM_FLAGS} $< -o $@
+${NAME_BIN}: ${OBJ_DIR} ${OBJS}
+	${CC} ${CFLAGS} ${OBJS} ${LDFLAGS} ${LDLIBS} -o $@
 
 ${NAME_ISO}:
-	@mkdir -p iso/boot/grub
-	@cp grub.cfg iso/boot/grub
-	@cp kernel.bin iso/boot
-	@grub-mkrescue -o kernel.iso iso
-	@qemu-system-i386 -cdrom kernel.iso
+	@mkdir -p ${ISO_DIR}/boot/grub
+	@cp grub.cfg ${ISO_DIR}/boot/grub
+	@cp ${NAME_BIN} ${ISO_DIR}/boot
+	@grub-mkrescue -o ${NAME_ISO} ${ISO_DIR}
+	@qemu-system-i386 -cdrom ${NAME_ISO}
+
+.PHONY: all
+all: install ${NAME_BIN} ${NAME_ISO}
+
+.PHONY: clean
 clean:
-	${RM} ${OBJS_C} ${OBJS_ASM}
-	${MAKE} -C libk clean
+	${RM} ${OBJ_DIR}
+	${MAKE} -C ${LIB_DIR} clean
 
+.PHONY: fclean
 fclean: clean
-	${RM} ${NAME} ${NAME_ISO} iso
-	${MAKE} -C libk fclean
+	${RM} ${NAME_BIN} ${NAME_ISO} ${ISO_DIR}
+	${MAKE} -C ${LIB_DIR} fclean
 
+.PHONY: re
 re: fclean all
-.PHONY: fclean clean all re

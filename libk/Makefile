@@ -1,35 +1,40 @@
-GCC = i386-elf-gcc
-AR = i386-elf-ar
-CCFLAGS = -c -Wall -Wextra -std=gnu99 -ffreestanding -nostdlib -nodefaultlibs
-RM = rm -f
-
-SRCS_ITOA = itoa/itoa.c itoa/uitoa.c itoa/uitoa_base.c
-
-SRCS_STRING = string/bzero.c string/memchr.c string/memcpm.c string/memcpy.c string/memmove.c string/memset.c \
-	      string/strchr.c string/strcmp.c string/strcpy.c string/strlen.c
-
-SRCS_STDIO = stdio/putchar.c stdio/puts.c stdio/printf.c
-
-SRCS += ${SRCS_ITOA}
-SRCS += ${SRCS_STRING}
-SRCS += ${SRCS_STDIO}
-SRCS += ${SRCS_UNISTD}
-
-OBJS = ${SRCS:.c=.o}
 NAME = libk.a
+RM = rm -rf
+
+INCLUDE_DIRS = drivers/video fs drivers/tty
+
+SRCS = itoa.c uitoa.c uitoa_base.c
+SRCS += bzero.c memchr.c memcpm.c memcpy.c memmove.c memset.c strchr.c \
+	strcmp.c strcpy.c strlen.c
+SRCS += putchar.c puts.c printf.c
+
+OBJ_DIR = obj
+OBJ_FILES = ${SRCS:.c=.o}
+OBJS = $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
+
+VPATH = itoa string stdio
+
+AR = i386-elf-ar
+ARFLAGS = -rcs
+CC = i386-elf-gcc
+CFLAGS = -c -Wall -Wextra -std=gnu99 -ffreestanding -nostdlib -nodefaultlibs
+CPPFLAGS = -I./include $(foreach dir, $(addprefix ../include/, $(INCLUDE_DIRS)), -I$(dir))
 
 all: ${NAME}
 
-$(NAME): ${OBJS}
-	${AR} -rcs ${NAME} ${OBJS}
+${OBJ_DIR}:
+	@mkdir -p $@
 
-%.o: %.c
-	${GCC} ${CCFLAGS} $< -o $@ -I ./include -I ../include/drivers/video -I ../include/fs -I ../include/drivers/tty
+$(NAME): ${OBJ_DIR} ${OBJS}
+	${AR} ${ARFLAGS} ${NAME} ${OBJS}
 
-bonus:	${NAME}
+${OBJ_DIR}/%.o: %.c
+	${CC} ${CFLAGS} ${CPPFLAGS} $< -o $@
+
+bonus: ${NAME}
 
 clean:
-	${RM} ${OBJS}
+	${RM} ${OBJ_DIR}
 
 fclean: clean
 	${RM} ${NAME}
