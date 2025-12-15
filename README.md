@@ -10,24 +10,37 @@
 
 ```bash
 .
+├── arch
+│   └── i386
+│       ├── boot
+│       │   └── boot.asm
+│       └── linker.ld
+├── docs
+│   └── notes.md
+├── drivers
+│   ├── keyboard
+│   ├── tty
+│   │   └── tty.c
+│   └── video
+│       └── console
+├── fs
+│   └── write.c
 ├── grub.cfg
+├── include
+│   ├── drivers
+│   │   ├── tty
+│   │   │   └── tty.h
+│   │   └── video
+│   │       └── vga.h
+│   └── fs
+│       └── fs.h
 ├── kernel
-│   ├── include
-│   │   ├── tty.h
-│   │   └── vga.h
-│   ├── kernel
-│   │   ├── assembly
-│   │   │   └── boot.asm
-│   │   └── kernel.c
-│   ├── linker.ld
-│   └── tty
-│       └── tty.c
+│   └── kernel.c
 ├── libk
 │   ├── include
 │   │   ├── itoa.h
 │   │   ├── stdio.h
-│   │   ├── string.h
-│   │   └── fs.h
+│   │   └── string.h
 │   ├── itoa
 │   │   ├── itoa.c
 │   │   ├── uitoa_base.c
@@ -37,19 +50,17 @@
 │   │   ├── printf.c
 │   │   ├── putchar.c
 │   │   └── puts.c
-│   ├── string
-│   │   ├── bzero.c
-│   │   ├── memchr.c
-│   │   ├── memcpm.c
-│   │   ├── memcpy.c
-│   │   ├── memmove.c
-│   │   ├── memset.c
-│   │   ├── strchr.c
-│   │   ├── strcmp.c
-│   │   ├── strcpy.c
-│   │   └── strlen.c
-│   └── unistd
-│       └── write.c
+│   └── string
+│       ├── bzero.c
+│       ├── memchr.c
+│       ├── memcpm.c
+│       ├── memcpy.c
+│       ├── memmove.c
+│       ├── memset.c
+│       ├── strchr.c
+│       ├── strcmp.c
+│       ├── strcpy.c
+│       └── strlen.c
 ├── Makefile
 └── README.md
 ```
