@@ -1,4 +1,4 @@
-#include <_itoa.h>
+#include <itoa.h>
 
 /**
  * @brief Cette fonction intervertit les caractères dans une string, ex. "24" devient "42"
@@ -29,7 +29,7 @@ static void	_swap(char *str, size_t i)
  * @param capslock 
  * @return const char* 
  */
-const char	*_uitoa_base(unsigned int n, int base, int capslock)
+const char	*uitoa_base(unsigned int n, int base, int capslock)
 {
     int i = 0;
     static char s_local[12];//variable locale

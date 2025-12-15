@@ -1,9 +1,10 @@
-#ifndef STDIO_H
-# define STDIO_H
+#ifndef IO_H
+# define IO_H
 
-//libc headers
+//fs header
+#include <fs.h>
+//libk headers
 #include <string.h>
-#include <unistd.h>
 #include <stdarg.h>
 
 int printf(const char *s, ...);

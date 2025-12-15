@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <_itoa.h>
+#include <itoa.h>
 
 
 
@@ -17,16 +17,16 @@ static int print(const char *s, va_list args)
     switch(*(s + 1))
     {
     case 'd':
-        return puts(_itoa(va_arg(args, int)));
+        return puts(itoa(va_arg(args, int)));
         break;
     case 'u':
-        return puts(_uitoa(va_arg(args, unsigned int)));
+        return puts(uitoa(va_arg(args, unsigned int)));
         break;
     case 'x':
-        return puts(_uitoa_base(va_arg(args, unsigned int), 16, 0));
+        return puts(uitoa_base(va_arg(args, unsigned int), 16, 0));
         break;
     case 'X':
-        return puts(_uitoa_base(va_arg(args, unsigned int), 16, 1));
+        return puts(uitoa_base(va_arg(args, unsigned int), 16, 1));
         break;
     case 's':
         char *str = va_arg(args, char *);

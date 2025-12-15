@@ -13,21 +13,25 @@ NASM_FLAGS=-f elf
 
 RM=rm -rf
 
-INCLUDE = -I ./kernel/include -I ./libc/include
+INCLUDE = -I ./include/drivers/video -I ./include/fs -I ./include/drivers/tty -I ./libk/include -I ./arch/i386/include
 
 
-LIB = -L./libc -lk -lgcc
+LIB = -L./libk -lk -lgcc
 
-PREFIX = kernel/kernel
-PREFIX_ASM = ${PREFIX}/assembly
+PREFIX_BOOT = arch/i386/boot
+PREFIX_TTY = drivers/tty
+PREFIX_KERNEL = kernel
+PREFIX_FS = fs
 
-SRCS_C = ${PREFIX}/kernel.c kernel/tty/tty.c
-SRCS_ASM = ${PREFIX_ASM}/boot.asm
+SRCS_C = ${PREFIX_KERNEL}/kernel.c
+SRCS_C += ${PREFIX_TTY}/tty.c
+SRCS_C += ${PREFIX_FS}/write.c
+SRCS_ASM = ${PREFIX_BOOT}/boot.asm
 
 OBJS_C=${SRCS_C:.c=.o}
 OBJS_ASM=${SRCS_ASM:.asm=.o}
 
-LINK=-T ./kernel/linker.ld
+LINK=-T ./arch/i386/linker.ld
 
 NAME=kernel.bin
 
@@ -38,7 +42,7 @@ LIB_EXE=libk.a
 all: ${LIB_EXE} ${NAME} ${NAME_ISO}
 
 ${LIB_EXE}:
-	${MAKE} -C libc
+	${MAKE} -C libk
 
 ${NAME}: ${OBJS_C} ${OBJS_ASM}
 	${GCC} ${CFLAGS}  ${OBJS_C} ${OBJS_ASM} ${LINK} -o ${NAME} ${INCLUDE} ${LIB}
@@ -57,11 +61,11 @@ ${NAME_ISO}:
 	@qemu-system-i386 -cdrom kernel.iso
 clean:
 	${RM} ${OBJS_C} ${OBJS_ASM}
-	${MAKE} -C libc clean
+	${MAKE} -C libk clean
 
 fclean: clean
 	${RM} ${NAME} ${NAME_ISO} iso
-	${MAKE} -C libc fclean
+	${MAKE} -C libk fclean
 
 re: fclean all
 .PHONY: fclean clean all re

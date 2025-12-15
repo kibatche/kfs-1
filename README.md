@@ -3,8 +3,8 @@
 ## Structuration du projet
 
 - Le dossier `kernel` contient les fichiers propres au kernel. Exemple : driver, écriture sur le terminal etc.
-- Le dossier `libc` contient un début de librairie C. Les implémentations ne sont pas standard pour la plupart.
-- Le Makefile principal archive la libc en `libk` ("libkernel"), puis ensuite le kernel en `kernel.bin`
+- Le dossier `libk` contient un début de librairie C. Les implémentations ne sont pas standard pour la plupart.
+- Le Makefile principal archive la libk en `libk` ("libkernel"), puis ensuite le kernel en `kernel.bin`
 - Ensuite, il archive sous forme d'iso le kernel, avec le fichier grub pour loader le kernel.
 - Pour terminer, qemu est utilisé afin d'émuler notre kernel.
 
@@ -22,16 +22,16 @@
 │   ├── linker.ld
 │   └── tty
 │       └── tty.c
-├── libc
+├── libk
 │   ├── include
-│   │   ├── _itoa.h
+│   │   ├── itoa.h
 │   │   ├── stdio.h
 │   │   ├── string.h
-│   │   └── unistd.h
-│   ├── _itoa
-│   │   ├── _itoa.c
-│   │   ├── _uitoa_base.c
-│   │   └── _uitoa.c
+│   │   └── fs.h
+│   ├── itoa
+│   │   ├── itoa.c
+│   │   ├── uitoa_base.c
+│   │   └── uitoa.c
 │   ├── Makefile
 │   ├── stdio
 │   │   ├── printf.c

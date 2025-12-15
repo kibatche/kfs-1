@@ -19,7 +19,7 @@ CHECKSUM equ -(MAGIC + FLAGS)
 ; et c'est donc au kernel de definir lui meme la stack. Cela laisse un peu de place pour creer une petite stack en crean un symbole en bas de la stack.
 ; 16384 bytes lui sont alloues, avec pour terminer la creation d'un symbole en haut de la stack.
 ; La stack grandit par en bas (lorsqu'on alloue de la memoire sur le stack, on "descend" dans la memoire (ie sub esp, 0x10)). Etant dans la section .bss, elle peut etre marque com
-; me notbit, ce qui a pour consequence qu'elle ne prend pas de place dans le fichier du kernel. La pile doit etre alginee sur 16 octets en x86 selon le standard System V abi.
+; me notbit, ce qui a pour consequence qu'elle ne prend pas de place dans le fichier du kernel. La pile doit etre alginee sur 16 octets en i386 selon le standard System V abi.
 ; Le compileur assume que la pile est correctement alignee, sans quoi un comportement indefini peut survenir.
 
 section .multiboot

@@ -1,4 +1,4 @@
-#include <_itoa.h>
+#include <itoa.h>
 
 static void	_swap(char *str, int i, int sign)
 {
@@ -30,7 +30,7 @@ static int	_abs(long n)
  * @param n 
  * @return const char* 
  */
-const char	*_itoa(long n)
+const char	*itoa(long n)
 {
     int i = 0;
     int sign = n < 0;
