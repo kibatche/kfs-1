@@ -66,7 +66,6 @@ all: install ${NAME_BIN} ${NAME_ISO}
 .PHONY: clean
 clean:
 	${RM} ${OBJ_DIR}
-	${MAKE} -C ${LIB_DIR} clean
 
 .PHONY: fclean
 fclean: clean
