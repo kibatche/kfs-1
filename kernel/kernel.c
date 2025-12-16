@@ -1,9 +1,8 @@
 #include <tty.h>
 #include <stdio.h>
 
-void kernel_main(void)
+void bonus_printf(void)
 {
-    terminal_init();
     int res = printf("%s %d %s\n", "Et le cordeau des trompettes marines", 12, "Un AUTRE TEST");
     printf("Nombre de caracteres ecrits : %d\n", res);
     // printf("%d %d %d\n", 42, 55, 68);
@@ -15,4 +14,17 @@ void kernel_main(void)
     // printf("Ceci est une chaine de caracteres : %s\n", "abcdefghijklmnopqrstuvwxy0123456789,;!?./%*");
     // printf("Ceci est une chaine de caracteres nulle: %s\n", NULL);
     // printf("Ceci est un caractere : %c\n", 'A');
+}
+
+void print_welcome_msg(void)
+{
+    terminal_set_color(vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
+    printf("42");
+    terminal_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+}
+
+void kernel_main(void)
+{
+    terminal_init();
+    print_welcome_msg();
 }

@@ -58,6 +58,9 @@ ${NAME_ISO}:
 	@cp grub.cfg ${ISO_DIR}/boot/grub
 	@cp ${NAME_BIN} ${ISO_DIR}/boot
 	@grub-mkrescue -o ${NAME_ISO} ${ISO_DIR}
+
+.PHONY: run
+run:
 	@qemu-system-i386 -cdrom ${NAME_ISO}
 
 .PHONY: all
