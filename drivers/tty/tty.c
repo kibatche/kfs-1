@@ -43,10 +43,15 @@ void update_cursor(size_t x, size_t y)
 
 static void update_terminal()
 {
-    for (size_t row = 0; row < (VGA_HEIGHT); row++)
+    for (size_t row = 0; row < VGA_HEIGHT - 1; row++)
     {
-        memcpy(&terminal_buff[row], &terminal_buff[row + 1], VGA_WIDTH);
+        memcpy(&terminal_buff[row * VGA_WIDTH], &terminal_buff[(row + 1) * VGA_WIDTH], VGA_WIDTH);
     }
+    for (size_t i = 0; i < VGA_WIDTH; i++)
+    {
+        terminal_buff[((VGA_HEIGHT - 1) * VGA_WIDTH) + i] = vga_entry(' ', terminal_color);
+    }
+
 }
 
 void handle_screen_limits(bool is_newline)
@@ -55,8 +60,9 @@ void handle_screen_limits(bool is_newline)
     {
         col_pos = 0;
         row_pos += 1;
-        if (row_pos >= VGA_HEIGHT)
+        if (row_pos == VGA_HEIGHT)
         {
+            row_pos--;
             update_terminal();
         }
     }
@@ -67,8 +73,9 @@ void handle_screen_limits(bool is_newline)
         {
             col_pos = 0;
             row_pos += 1;
-            if (row_pos + 1 >= VGA_HEIGHT)
+            if (row_pos == VGA_HEIGHT)
             {
+                row_pos--;
                 update_terminal();
             }
         }
