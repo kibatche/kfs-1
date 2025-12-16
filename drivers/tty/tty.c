@@ -41,14 +41,24 @@ void update_cursor(size_t x, size_t y)
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_DATA_BYTE_PORT);
 }
 
+static void update_terminal()
+{
+    for (size_t row = 0; row < (VGA_HEIGHT); row++)
+    {
+        memcpy(&terminal_buff[row], &terminal_buff[row + 1], VGA_WIDTH);
+    }
+}
+
 void handle_screen_limits(bool is_newline)
 {
     if (is_newline)
     {
         col_pos = 0;
         row_pos += 1;
-        if (row_pos == VGA_HEIGHT)
-            row_pos = 0;
+        if (row_pos >= VGA_HEIGHT)
+        {
+            update_terminal();
+        }
     }
     else
     {
@@ -57,8 +67,10 @@ void handle_screen_limits(bool is_newline)
         {
             col_pos = 0;
             row_pos += 1;
-            if (row_pos == VGA_HEIGHT)
-                row_pos = 0;
+            if (row_pos + 1 >= VGA_HEIGHT)
+            {
+                update_terminal();
+            }
         }
     }
 }
