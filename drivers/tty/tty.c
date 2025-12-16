@@ -13,8 +13,8 @@
 /**
  * variables globales pour le terminal et les differents calculs
 **/
-size_t cursor_x;
-size_t cursor_y;
+size_t col_pos;
+size_t row_pos;
 uint8_t terminal_color;
 uint16_t *terminal_buff = (uint16_t *)VGA_MEMORY;
 
@@ -41,24 +41,49 @@ void update_cursor(size_t x, size_t y)
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_DATA_BYTE_PORT);
 }
 
-int terminal_putchar(char c)
+void handle_screen_limits(bool is_newline)
 {
-    if (c == '\n')
+    if (is_newline)
     {
-        cursor_y += 1;
+        col_pos = 0;
+        row_pos += 1;
+        if (row_pos == VGA_HEIGHT)
+            row_pos = 0;
     }
     else
     {
-        cursor_x += 1;
-        if (cursor_x == VGA_WIDTH)
+        col_pos += 1;
+        if (col_pos == VGA_WIDTH)
         {
-            cursor_x = 0;
-            cursor_y += 1;
+            col_pos = 0;
+            row_pos += 1;
+            if (row_pos == VGA_HEIGHT)
+                row_pos = 0;
         }
-        const size_t idx = cursor_x + (cursor_y * VGA_WIDTH);
+    }
+}
+
+void terminal_set_color(uint8_t color)
+{
+    terminal_color = color;
+}
+
+void terminal_reset_color()
+{
+    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+}
+
+int terminal_putchar(char c)
+{
+    bool is_newline = (c == '\n');
+
+    if (!is_newline)
+    {
+        const size_t idx = col_pos + (row_pos * VGA_WIDTH);
         terminal_buff[idx] = vga_entry(c, terminal_color);
     }
-    update_cursor(cursor_x, cursor_y);
+    handle_screen_limits(is_newline);
+    update_cursor(col_pos, row_pos);
     return (1);
  }
 
@@ -75,7 +100,7 @@ size_t terminal_write(const char *str, size_t len)
 
 void terminal_init(void)
 {
-    cursor_x = 0;
-    cursor_y = 0;
-    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    col_pos = 0;
+    row_pos = 0;
+    terminal_reset_color();
 }

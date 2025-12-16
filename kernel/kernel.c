@@ -16,9 +16,15 @@ void bonus_printf(void)
     // printf("Ceci est un caractere : %c\n", 'A');
 }
 
+void print_welcome_msg(void)
+{
+    terminal_set_color(vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
+    printf("42");
+    terminal_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+}
+
 void kernel_main(void)
 {
     terminal_init();
-    terminal_write("42", 2);
-    bonus_printf();
+    print_welcome_msg();
 }
