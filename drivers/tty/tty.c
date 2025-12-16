@@ -7,9 +7,6 @@
     #error "Ce kernel doit etre compile en 32 bits."
 #endif
 
-#define VGA_INDEX_BYTE_PORT 0x3D4
-#define VGA_DATA_BYTE_PORT 0x3D5
-
 /**
  * variables globales pour le terminal et les differents calculs
 **/
