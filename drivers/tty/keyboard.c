@@ -36,10 +36,31 @@ const char kbdus_caps[] = {
     '-', '4', '5', '6', '+', '1', '2', '3', '0', '.'
 };
 
+void handle_special_keys(unsigned char scancode)
+{
+    switch (scancode)
+    {
+    case ARROW_UP:
+        move_cursor(0, -1);
+        break;
+    case ARROW_DOWN:
+        move_cursor(0, 1);
+        break;
+    case ARROW_LEFT:
+        move_cursor(-1, 0);
+        break;
+    case ARROW_RIGHT:
+        move_cursor(1, 0);
+        break;
+    default:
+        return;
+    }
+}
+
 /**
- * Display pressed key to screen.
+ * Handle pressed keys (display character or move cursor).
  */
-void print_key(void)
+void handle_key(void)
 {
     const unsigned char status_flags = inb(PS2_STATUS_REGISTER);
     const unsigned char input_buffer_status = status_flags & PS2_INPUT_STATUS_OFFSET;
@@ -48,11 +69,18 @@ void print_key(void)
     if (buffer_is_full)
     {
         unsigned char scancode = inb(PS2_IO_PORT_DATA);
-        const char key = kbdus[scancode];
 
-        if (key)
+        if (scancode == KEY_ESCAPE_SEQ)
         {
-            terminal_putchar(key);
+            scancode = inb(PS2_IO_PORT_DATA);
+            handle_special_keys(scancode);
+        }
+        else
+        {
+            const char key = kbdus[scancode];
+
+            if (key)
+                terminal_putchar(key);
         }
     }
 }

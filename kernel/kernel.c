@@ -30,6 +30,6 @@ void kernel_main(void)
 
     while (1)
     {
-        print_key();
+        handle_key();
     }
 }

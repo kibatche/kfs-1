@@ -15,7 +15,7 @@
 static int print(const char *s, va_list *args)
 {
     const char *str = NULL;
-    switch(*(s + 1))
+    switch (*(s + 1))
     {
     case 'd':
         str = itoa(va_arg(*args, int));
