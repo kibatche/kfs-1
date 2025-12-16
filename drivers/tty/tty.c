@@ -45,7 +45,7 @@ static void update_terminal()
 {
     for (size_t row = 0; row < VGA_HEIGHT - 1; row++)
     {
-        memcpy(&terminal_buff[row * VGA_WIDTH], &terminal_buff[(row + 1) * VGA_WIDTH], VGA_WIDTH);
+        memcpy(&terminal_buff[row * VGA_WIDTH], &terminal_buff[(row + 1) * VGA_WIDTH], VGA_WIDTH * sizeof(uint16_t));
     }
     for (size_t i = 0; i < VGA_WIDTH; i++)
     {
