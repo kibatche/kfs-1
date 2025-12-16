@@ -47,14 +47,13 @@ int terminal_putchar(char c)
 
 int terminal_write(const char *str, size_t len)
 {
-    char *sc = (char *)str;
-    int written = len;
+    int i = 0;
 
-    while (len--)
+    while (str[i] && i < len)
     {
-        written += terminal_putchar(*sc++);
+        terminal_putchar(str[i++]);
     }
-    return written;
+    return i;
 }
 
 void terminal_set_cursor(bool newline)
