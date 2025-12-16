@@ -7,73 +7,75 @@
     #error "Ce kernel doit etre compile en 32 bits."
 #endif
 
-/**
- * variables globales pour le terminal et es differents calculs
-**/
+#define VGA_INDEX_BYTE_PORT 0x3D4
+#define VGA_DATA_BYTE_PORT 0x3D5
 
-size_t terminal_row;
-size_t terminal_col;
+/**
+ * variables globales pour le terminal et les differents calculs
+**/
+size_t cursor_x;
+size_t cursor_y;
 uint8_t terminal_color;
 uint16_t *terminal_buff = (uint16_t *)VGA_MEMORY;
 
-void terminal_init(void)
+unsigned char inb(unsigned short port)
 {
-    terminal_row = 0;
-    terminal_col = 0;
-    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    unsigned char result;
 
-    for (size_t y = 0; y < VGA_HEIGHT; y++)
-    {
-	for (size_t x = 0; x < VGA_WIDTH; x++)
-	{
-	    const size_t idx = y * VGA_WIDTH + x;
-	    terminal_buff[idx] = vga_entry(' ', terminal_col);
-	}
-    }
+    __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
+    return (result);
+}
+
+void outb(unsigned char data, unsigned short port)
+{
+    __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
+}
+
+void update_cursor(size_t x, size_t y)
+{
+    uint16_t pos = x + (y * VGA_WIDTH);
+
+    outb(0x0F, VGA_INDEX_BYTE_PORT);
+    outb((uint8_t) (pos & 0xFF), VGA_DATA_BYTE_PORT);
+    outb(0x0E, VGA_INDEX_BYTE_PORT);
+    outb((uint8_t) ((pos >> 8) & 0xFF), VGA_DATA_BYTE_PORT);
 }
 
 int terminal_putchar(char c)
 {
-    const size_t idx = terminal_row * VGA_WIDTH + terminal_col;
-    if (c != '\n')
+    if (c == '\n')
     {
-        terminal_buff[idx] = vga_entry(c, terminal_color);
-        terminal_set_cursor(false);
+        cursor_y += 1;
     }
     else
-       terminal_set_cursor(true);
-    return 1;
+    {
+        cursor_x += 1;
+        if (cursor_x == VGA_WIDTH)
+        {
+            cursor_x = 0;
+            cursor_y += 1;
+        }
+        const size_t idx = cursor_x + (cursor_y * VGA_WIDTH);
+        terminal_buff[idx] = vga_entry(c, terminal_color);
+    }
+    update_cursor(cursor_x, cursor_y);
+    return (1);
  }
 
-int terminal_write(const char *str, size_t len)
+size_t terminal_write(const char *str, size_t len)
 {
-    int i = 0;
+    size_t i = 0;
 
     while (str[i] && i < len)
     {
         terminal_putchar(str[i++]);
     }
-    return i;
+    return (i);
 }
 
-void terminal_set_cursor(bool newline)
+void terminal_init(void)
 {
-    if (newline == true)
-    {
-        terminal_col = 0;
-        if (++terminal_row == VGA_HEIGHT)
-            terminal_row = 0;
-        return;
-    }
-    if (++terminal_col == VGA_WIDTH) {
-	    terminal_col  = 0;
-	    if (++terminal_row == VGA_HEIGHT)
-            terminal_row = 0;
-    }
+    cursor_x = 0;
+    cursor_y = 0;
+    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
-
-void terminal_set_color(uint8_t color)
-{
-    terminal_color = color;
-}
-

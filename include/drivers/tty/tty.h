@@ -7,10 +7,11 @@
 #include <string.h>
 #include <vga.h>
 
+unsigned char inb(unsigned short port);
+void outb(unsigned char data, unsigned short port);
+void update_cursor(size_t x, size_t y);
 void terminal_init(void);
-void terminal_set_color(uint8_t color);
-void terminal_set_cursor(bool newline);
 int terminal_putchar(char c);
-int terminal_write(const char *str, size_t len);
+size_t terminal_write(const char *str, size_t len);
 
 #endif
