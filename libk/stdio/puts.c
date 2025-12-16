@@ -8,7 +8,13 @@
  */
 int puts(const char *s)
 {
+    int len = 0;
+    char nl = '\n';
     if (s)
-        return write(1, s, strlen(s));
+    {
+        len = write(1, s, strlen(s));
+        write(1, &nl, 1);
+        return len + 1;
+    }
     return -1;
 }

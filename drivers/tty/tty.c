@@ -22,7 +22,7 @@ void terminal_init(void)
     terminal_col = 0;
     terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
-    for (size_t y = 0; y < VGA_HEIGTH; y++)
+    for (size_t y = 0; y < VGA_HEIGHT; y++)
     {
 	for (size_t x = 0; x < VGA_WIDTH; x++)
 	{
@@ -47,13 +47,14 @@ int terminal_putchar(char c)
 
 int terminal_write(const char *str, size_t len)
 {
-    int i = 0;
-    while(str[i] && i < (int)len)
+    char *sc = (char *)str;
+    int written = len;
+
+    while (len--)
     {
-        terminal_putchar(str[i]);
-        i++;
+        written += terminal_putchar(*sc++);
     }
-    return i;
+    return written;
 }
 
 void terminal_set_cursor(bool newline)
@@ -61,13 +62,13 @@ void terminal_set_cursor(bool newline)
     if (newline == true)
     {
         terminal_col = 0;
-        if (++terminal_row == VGA_HEIGTH)
+        if (++terminal_row == VGA_HEIGHT)
             terminal_row = 0;
         return;
     }
     if (++terminal_col == VGA_WIDTH) {
 	    terminal_col  = 0;
-	    if (++terminal_row == VGA_HEIGTH)
+	    if (++terminal_row == VGA_HEIGHT)
             terminal_row = 0;
     }
 }

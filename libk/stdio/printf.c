@@ -12,30 +12,35 @@
  * @param args 
  * @return int 
  */
-static int print(const char *s, va_list args)
+static int print(const char *s, va_list *args)
 {
+    const char *str = NULL;
     switch(*(s + 1))
     {
     case 'd':
-        return puts(itoa(va_arg(args, int)));
+        str = itoa(va_arg(*args, int));
+        return write(1, str, strlen(str));
         break;
     case 'u':
-        return puts(uitoa(va_arg(args, unsigned int)));
+        str = uitoa(va_arg(*args, unsigned int));
+        return write(1, str, strlen(str));
         break;
     case 'x':
-        return puts(uitoa_base(va_arg(args, unsigned int), 16, 0));
+        str = uitoa_base(va_arg(*args, unsigned int), 16, 0);
+        return write(1, str, strlen(str));
         break;
     case 'X':
-        return puts(uitoa_base(va_arg(args, unsigned int), 16, 1));
+        str = uitoa_base(va_arg(*args, unsigned int), 16, 1);
+        return write(1, str, strlen(str));
         break;
     case 's':
-        char *str = va_arg(args, char *);
+        str = va_arg(*args, char *);
         if (str)
-            return puts(str);
-        return puts("(null)");
+            return write(1, str, strlen(str));
+        return write(1, "(null)", 6);
         break;
     case 'c':
-        return putchar(va_arg(args, int));
+        return putchar(va_arg(*args, int));
         break;
     case '%':
         return putchar('%');
@@ -63,9 +68,9 @@ int printf(const char *s, ...)
     while (*s)
     {
         if (*s == '%')
-            print(s++, args);
+            res += print(s++, &args);
         else
-            putchar(*s);
+            res += putchar(*s);
         s++;
     }
     va_end(args);
