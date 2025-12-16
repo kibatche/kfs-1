@@ -1,4 +1,5 @@
 #include <tty.h>
+#include <stdio.h>
 #if defined(__linux__)
     #error "Utilisation d'un cross-compiler obligatoire"
 #endif
@@ -7,6 +8,9 @@
     #error "Ce kernel doit etre compile en 32 bits."
 #endif
 
+/**
+ * Keyboard mappings.
+ */
 const char kbdus[] = {
     0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,
     '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
@@ -32,15 +36,23 @@ const char kbdus_caps[] = {
     '-', '4', '5', '6', '+', '1', '2', '3', '0', '.'
 };
 
-char print_key(void)
+/**
+ * Display pressed key to screen.
+ */
+void print_key(void)
 {
-    unsigned char scancode = inb(0x60);
-    const char key = kbdus[scancode];
+    const unsigned char status_flags = inb(PS2_STATUS_REGISTER);
+    const unsigned char input_buffer_status = status_flags & PS2_INPUT_STATUS_OFFSET;
+    const bool buffer_is_full = (input_buffer_status == 1);
 
-    if (key)
+    if (buffer_is_full)
     {
-        terminal_putchar(key);
-        return (key);
+        unsigned char scancode = inb(PS2_IO_PORT_DATA);
+        const char key = kbdus[scancode];
+
+        if (key)
+        {
+            terminal_putchar(key);
+        }
     }
-    return (0);
 }

@@ -32,10 +32,10 @@ void update_cursor(size_t x, size_t y)
 {
     uint16_t pos = x + (y * VGA_WIDTH);
 
-    outb(0x0F, VGA_INDEX_BYTE_PORT);
-    outb((uint8_t) (pos & 0xFF), VGA_DATA_BYTE_PORT);
-    outb(0x0E, VGA_INDEX_BYTE_PORT);
-    outb((uint8_t) ((pos >> 8) & 0xFF), VGA_DATA_BYTE_PORT);
+    outb(0x0F, VGA_PORT_INDEX);
+    outb((uint8_t) (pos & 0xFF), VGA_PORT_DATA);
+    outb(0x0E, VGA_PORT_INDEX);
+    outb((uint8_t) ((pos >> 8) & 0xFF), VGA_PORT_DATA);
 }
 
 void handle_screen_limits(bool is_newline)

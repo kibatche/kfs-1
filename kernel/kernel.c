@@ -27,4 +27,9 @@ void kernel_main(void)
 {
     terminal_init();
     print_welcome_msg();
+
+    while (1)
+    {
+        print_key();
+    }
 }
