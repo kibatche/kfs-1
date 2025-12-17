@@ -1,6 +1,8 @@
 #include <tty.h>
 #include <stdio.h>
 
+extern uint16_t *terminal_buff;
+
 void bonus_printf(void)
 {
     int res = printf("%s %d %s\n", "Et le cordeau des trompettes marines", 12, "Un AUTRE TEST");
