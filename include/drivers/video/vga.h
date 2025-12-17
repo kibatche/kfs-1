@@ -1,12 +1,9 @@
 #ifndef VGA_H
 # define VGA_H
 
-/**
- * Taille du terminal
-**/
-#define VGA_WIDTH 80
-#define VGA_HEIGHT 25
-#define VGA_MEMORY 0xB8000
+# define VGA_WIDTH 80
+# define VGA_HEIGHT 25
+# define VGA_MEMORY 0xB8000
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,

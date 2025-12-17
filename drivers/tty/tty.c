@@ -28,7 +28,7 @@ void outb(unsigned char data, unsigned short port)
     __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
-void update_cursor(int x, int y)
+static void update_cursor(int x, int y)
 {
     uint16_t pos = x + (y * VGA_WIDTH);
 
@@ -36,6 +36,15 @@ void update_cursor(int x, int y)
     outb((uint8_t) (pos & 0xFF), VGA_PORT_DATA);
     outb(0x0E, VGA_PORT_INDEX);
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_PORT_DATA);
+}
+
+static void terminal_update()
+{
+    for (size_t row = 0; row < VGA_HEIGHT - 1; row++)
+        memcpy(&terminal_buff[row * VGA_WIDTH], &terminal_buff[(row + 1) * VGA_WIDTH], VGA_WIDTH * sizeof(uint16_t));
+
+    for (size_t i = 0; i < VGA_WIDTH; i++)
+        terminal_buff[((VGA_HEIGHT - 1) * VGA_WIDTH) + i] = vga_entry(' ', terminal_color);
 }
 
 void move_cursor(int offset_x, int offset_y)
@@ -62,37 +71,17 @@ void move_cursor(int offset_x, int offset_y)
     {
         row_pos = new_row_pos;
     }
-    
     if (new_row_pos == VGA_HEIGHT)
     {
         row_pos = VGA_HEIGHT - 1;
         terminal_update();
     }
-    
     update_cursor(col_pos, row_pos);
-}
-
-void terminal_update()
-{
-    for (size_t row = 0; row < VGA_HEIGHT - 1; row++)
-    {
-        memcpy(&terminal_buff[row * VGA_WIDTH], &terminal_buff[(row + 1) * VGA_WIDTH], VGA_WIDTH * sizeof(uint16_t));
-    }
-
-    for (size_t i = 0; i < VGA_WIDTH; i++)
-    {
-        terminal_buff[((VGA_HEIGHT - 1) * VGA_WIDTH) + i] = vga_entry(' ', terminal_color);
-    }
 }
 
 void terminal_set_color(uint8_t color)
 {
     terminal_color = color;
-}
-
-void terminal_reset_color()
-{
-    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 int terminal_putchar(char c)
@@ -116,13 +105,11 @@ size_t terminal_write(const char *str, size_t len)
     size_t i = 0;
 
     while (str[i] && i < len)
-    {
         terminal_putchar(str[i++]);
-    }
     return (i);
 }
 
-void terminal_set_blank_spaces()
+static void terminal_set_blank_spaces()
 {
     for (int i = 0; i < VGA_WIDTH; i++)
     {
@@ -137,6 +124,7 @@ void terminal_init(void)
 {
     col_pos = 0;
     row_pos = 0;
-    terminal_reset_color();
+    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+
     terminal_set_blank_spaces();
 }
