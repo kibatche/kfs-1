@@ -1,5 +1,4 @@
 #include <tty.h>
-#include <stdio.h>
 #if defined(__linux__)
     #error "Utilisation d'un cross-compiler obligatoire"
 #endif
@@ -38,20 +37,20 @@ const char kbdus_caps[] = {
 bool capslock_on = false;
 bool shift_on = false;
 
-static void handle_extended_key(unsigned char scancode)
+static void handle_extended_key(unsigned char scancode, const bool is_pressed)
 {
     switch (scancode)
     {
-    case ARROW_UP:
+    case SCANCODE_ARROW_UP:
         move_cursor(0, -1);
         break;
-    case ARROW_DOWN:
+    case SCANCODE_ARROW_DOWN:
         move_cursor(0, 1);
         break;
-    case ARROW_LEFT:
+    case SCANCODE_ARROW_LEFT:
         move_cursor(-1, 0);
         break;
-    case ARROW_RIGHT:
+    case SCANCODE_ARROW_RIGHT:
         move_cursor(1, 0);
         break;
     default:
@@ -63,21 +62,31 @@ static void handle_extended_key(unsigned char scancode)
 */
 static void handle_key(unsigned char scancode, const bool is_pressed, const bool is_extended_key)
 {
-    if (scancode == 0x3a)
+    if (scancode == SCANCODE_CAPSLOCK)
     {
         capslock_on = !(capslock_on && is_pressed);
+    }
+    else if (
+        (scancode == SCANCODE_LSHIFT) || (scancode == SCANCODE_RSHIFT) \
+        || ((scancode ^ KEY_PRESSED_MASK) == SCANCODE_LSHIFT) || ((scancode ^ KEY_PRESSED_MASK) == SCANCODE_RSHIFT)
+    )
+    {
+        shift_on = is_pressed;
     }
     else if (is_pressed)
     {
         if (is_extended_key)
         {
-            handle_extended_key(scancode);
+            handle_extended_key(scancode, is_pressed);
         }
         else
         {
             char key;
-            if (capslock_on)
+
+            if (capslock_on && !shift_on)
                 key = kbdus_caps[scancode];
+            else if (shift_on && !capslock_on)
+                key = kbdus_shift[scancode];
             else
                 key = kbdus[scancode];
 
@@ -104,7 +113,7 @@ void process_scancodes(void)
         if (is_extended_key)
             scancode = inb(PS2_IO_PORT_DATA);
 
-        const bool is_pressed = ((scancode & 128) == 0);
+        const bool is_pressed = ((scancode & KEY_PRESSED_MASK) == 0);
         handle_key(scancode, is_pressed, is_extended_key);
     }
 }

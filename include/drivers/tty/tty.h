@@ -14,10 +14,17 @@
 #define PS2_INPUT_STATUS_OFFSET 0x1
 
 #define KEY_ESCAPE_SEQ 0xE0
-#define ARROW_UP 0x48
-#define ARROW_DOWN 0x50
-#define ARROW_LEFT 0x4B
-#define ARROW_RIGHT 0x4D
+#define KEY_PRESSED_MASK 0x80
+#define SCANCODE_CAPSLOCK 0x3a
+#define SCANCODE_LSHIFT 0x2A
+#define SCANCODE_RSHIFT 0x36
+#define SCANCODE_DEL 0x53
+#define SCANCODE_ARROW_UP 0x48
+#define SCANCODE_ARROW_DOWN 0x50
+#define SCANCODE_ARROW_LEFT 0x4B
+#define SCANCODE_ARROW_RIGHT 0x4D
+#define SCANCODE_F1 0x3b
+#define SCANCODE_F2 0x3c
 
 unsigned char inb(unsigned short port);
 void outb(unsigned char data, unsigned short port);

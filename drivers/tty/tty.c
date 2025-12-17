@@ -77,7 +77,7 @@ void terminal_reset_color()
 
 int terminal_putchar(char c)
 {
-    bool is_newline = (c == '\n');
+    const bool is_newline = (c == '\n');
 
     if (is_newline)
     {
