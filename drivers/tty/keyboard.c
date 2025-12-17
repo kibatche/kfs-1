@@ -57,12 +57,18 @@ static void handle_extended_key(unsigned char scancode, const bool is_pressed)
         return;
     }
 }
+
 /**
 * Handle key (store caps lock state, display character or move cursor).
 */
 static void handle_key(unsigned char scancode, const bool is_pressed, const bool is_extended_key)
 {
-    if (scancode == SCANCODE_CAPSLOCK)
+    if (scancode == SCANCODE_BACKSPACE)
+    {
+        // TODO
+        ;
+    }
+    else if (scancode == SCANCODE_CAPSLOCK)
     {
         capslock_on = !(capslock_on && is_pressed);
     }
@@ -78,6 +84,11 @@ static void handle_key(unsigned char scancode, const bool is_pressed, const bool
         if (is_extended_key)
         {
             handle_extended_key(scancode, is_pressed);
+        }
+        else if ((scancode == SCANCODE_F1) || (scancode == SCANCODE_F2))
+        {
+            // TODO
+            ;
         }
         else
         {
