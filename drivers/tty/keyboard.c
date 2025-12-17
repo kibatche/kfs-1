@@ -8,7 +8,7 @@
 #endif
 
 /* Keyboard mappings. */
-const char kbdus[] = {
+const char keyboard_us[] = {
     0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,
     '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
     '\n', 0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
@@ -16,7 +16,7 @@ const char kbdus[] = {
     '*', 0, ' ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '7', '8', '9',
     '-', '4', '5', '6', '+', '1', '2', '3', '0', '.'
 };
-const char kbdus_shift[] = {
+const char keyboard_us_shift[] = {
     0, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 0,
     '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}',
     '\n', 0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '\"', '~',
@@ -24,7 +24,7 @@ const char kbdus_shift[] = {
     '*', 0, ' ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '7', '8', '9',
     '-', '4', '5', '6', '+', '1', '2', '3', '0', '.'
 };
-const char kbdus_caps[] = {
+const char keyboard_us_caps[] = {
     0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,
     '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']',
     '\n', 0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', '`',
@@ -37,9 +37,11 @@ const char kbdus_caps[] = {
 bool capslock_on = false;
 bool shift_on = false;
 
-static void handle_extended_key(unsigned char scancode, const bool is_pressed)
+/**
+* Handle extended key.
+*/
+static void handle_extended_key(unsigned char scancode)
 {
-    (void)is_pressed;
     switch (scancode)
     {
     case SCANCODE_ARROW_UP:
@@ -54,7 +56,7 @@ static void handle_extended_key(unsigned char scancode, const bool is_pressed)
     case SCANCODE_ARROW_RIGHT:
         move_cursor(1, 0);
         break;
-    default:
+    default:  // NOTE: For now, only arrows are handled
         return;
     }
 }
@@ -64,18 +66,15 @@ static void handle_extended_key(unsigned char scancode, const bool is_pressed)
 */
 static void handle_key(unsigned char scancode, const bool is_pressed, const bool is_extended_key)
 {
-    if (scancode == SCANCODE_BACKSPACE)
-    {
-        // TODO
-        ;
-    }
-    else if (scancode == SCANCODE_CAPSLOCK)
+    if (scancode == SCANCODE_CAPSLOCK)
     {
         capslock_on = !(capslock_on && is_pressed);
     }
     else if (
-        (scancode == SCANCODE_LSHIFT) || (scancode == SCANCODE_RSHIFT) \
-        || ((scancode ^ KEY_PRESSED_MASK) == SCANCODE_LSHIFT) || ((scancode ^ KEY_PRESSED_MASK) == SCANCODE_RSHIFT)
+        (scancode == SCANCODE_LSHIFT) \
+        || (scancode == SCANCODE_RSHIFT) \
+        || ((scancode ^ PRESSED_KEY_MASK) == SCANCODE_LSHIFT) \
+        || ((scancode ^ PRESSED_KEY_MASK) == SCANCODE_RSHIFT)
     )
     {
         shift_on = is_pressed;
@@ -84,7 +83,7 @@ static void handle_key(unsigned char scancode, const bool is_pressed, const bool
     {
         if (is_extended_key)
         {
-            handle_extended_key(scancode, is_pressed);
+            handle_extended_key(scancode);
         }
         else if ((scancode == SCANCODE_F1) || (scancode == SCANCODE_F2))
         {
@@ -96,11 +95,11 @@ static void handle_key(unsigned char scancode, const bool is_pressed, const bool
             char key;
 
             if (capslock_on && !shift_on)
-                key = kbdus_caps[scancode];
+                key = keyboard_us_caps[scancode];
             else if (shift_on && !capslock_on)
-                key = kbdus_shift[scancode];
+                key = keyboard_us_shift[scancode];
             else
-                key = kbdus[scancode];
+                key = keyboard_us[scancode];
 
             if (key)
                 terminal_putchar(key);
@@ -120,12 +119,15 @@ void process_scancodes(void)
     if (buffer_is_full)
     {
         unsigned char scancode = inb(PS2_IO_PORT_DATA);
-        const bool is_extended_key = (scancode == KEY_ESCAPE_SEQ);
-
+        const bool is_extended_key = (scancode == SCANCODE_EXTENDED_KEY);
+        // Keys that were not present on standard keyboards have extended scancodes
+        // (e.g., home, page up, page down, del, ctrl, alt, shift, ...).
+        // They generate two different interrupts: the first containing the E0 byte,
+        // the second containing the scancode.
         if (is_extended_key)
             scancode = inb(PS2_IO_PORT_DATA);
 
-        const bool is_pressed = ((scancode & KEY_PRESSED_MASK) == 0);
+        const bool is_pressed = ((scancode & PRESSED_KEY_MASK) == 0);
         handle_key(scancode, is_pressed, is_extended_key);
     }
 }
