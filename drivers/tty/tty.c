@@ -38,17 +38,18 @@ void update_cursor(size_t x, size_t y)
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_PORT_DATA);
 }
 
+
 void move_cursor(size_t offset_x, size_t offset_y)
 {
     size_t new_col_pos = col_pos + offset_x;
     size_t new_row_pos = row_pos + offset_y;
-
+    
     if (new_col_pos < 0)  // TODO: fix
     {
         --new_row_pos;
         col_pos = VGA_WIDTH + new_col_pos;
     }
-    else if (new_col_pos > VGA_WIDTH)
+    else if (new_col_pos >= VGA_WIDTH)
     {
         ++new_row_pos;
         col_pos = new_col_pos - VGA_WIDTH;
@@ -57,12 +58,33 @@ void move_cursor(size_t offset_x, size_t offset_y)
     {
         col_pos = new_col_pos;
     }
-
+    
     if (new_row_pos < VGA_HEIGHT)
     {
         row_pos = new_row_pos;
     }
+    
+    if (new_row_pos == VGA_HEIGHT)
+    {
+        row_pos = VGA_HEIGHT - 1;
+        terminal_update();
+    }
+    
     update_cursor(col_pos, row_pos);
+}
+
+void terminal_update()
+{
+    for (size_t row = 0; row < VGA_HEIGHT - 1; row++)
+    {
+        memcpy(&terminal_buff[row * VGA_WIDTH], &terminal_buff[(row + 1) * VGA_WIDTH], VGA_WIDTH * sizeof(uint16_t));
+    }
+
+    for (size_t i = 0; i < VGA_WIDTH; i++)
+    {
+        terminal_buff[((VGA_HEIGHT - 1) * VGA_WIDTH) + i] = vga_entry(' ', terminal_color);
+    }
+
 }
 
 void terminal_set_color(uint8_t color)
@@ -73,6 +95,17 @@ void terminal_set_color(uint8_t color)
 void terminal_reset_color()
 {
     terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+}
+
+void terminal_set_blank_spaces()
+{
+    for (size_t i = 0; i < VGA_WIDTH;i++)
+    {
+        for (size_t j = 0; j < VGA_HEIGHT; j++)
+        {
+            terminal_buff[i + (j * VGA_WIDTH);] = vga_entry(' ', terminal_color);
+        }
+    }
 }
 
 int terminal_putchar(char c)
