@@ -28,7 +28,7 @@ void outb(unsigned char data, unsigned short port)
     __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
-void update_cursor(size_t x, size_t y)
+void update_cursor(int x, int y)
 {
     uint16_t pos = x + (y * VGA_WIDTH);
 
@@ -38,12 +38,12 @@ void update_cursor(size_t x, size_t y)
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_PORT_DATA);
 }
 
-void move_cursor(size_t offset_x, size_t offset_y)
+void move_cursor(int offset_x, int offset_y)
 {
-    size_t new_col_pos = col_pos + offset_x;
-    size_t new_row_pos = row_pos + offset_y;
+    int new_col_pos = col_pos + offset_x;
+    int new_row_pos = row_pos + offset_y;
 
-    if (new_col_pos <= 0)
+    if (new_col_pos < 0)
     {
         --new_row_pos;
         col_pos = VGA_WIDTH + new_col_pos;
@@ -58,7 +58,7 @@ void move_cursor(size_t offset_x, size_t offset_y)
         col_pos = new_col_pos;
     }
 
-    if (new_row_pos < VGA_HEIGHT)
+    if ((new_row_pos >= 0) && (new_row_pos < VGA_HEIGHT))
     {
         row_pos = new_row_pos;
     }
