@@ -30,6 +30,6 @@ void kernel_main(void)
 
     while (1)
     {
-        handle_key();
+        process_scancodes();
     }
 }

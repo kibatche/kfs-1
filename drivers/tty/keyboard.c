@@ -8,9 +8,7 @@
     #error "Ce kernel doit etre compile en 32 bits."
 #endif
 
-/**
- * Keyboard mappings.
- */
+/* Keyboard mappings. */
 const char kbdus[] = {
     0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,
     '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
@@ -36,7 +34,11 @@ const char kbdus_caps[] = {
     '-', '4', '5', '6', '+', '1', '2', '3', '0', '.'
 };
 
-void handle_special_keys(unsigned char scancode)
+/* Pressed keys. */
+bool capslock_on = false;
+bool shift_on = false;
+
+static void handle_extended_key(unsigned char scancode)
 {
     switch (scancode)
     {
@@ -56,11 +58,39 @@ void handle_special_keys(unsigned char scancode)
         return;
     }
 }
+/**
+* Handle key (store caps lock state, display character or move cursor).
+*/
+static void handle_key(unsigned char scancode, const bool is_pressed, const bool is_extended_key)
+{
+    if (scancode == 0x3a)
+    {
+        capslock_on = !(capslock_on && is_pressed);
+    }
+    else if (is_pressed)
+    {
+        if (is_extended_key)
+        {
+            handle_extended_key(scancode);
+        }
+        else
+        {
+            char key;
+            if (capslock_on)
+                key = kbdus_caps[scancode];
+            else
+                key = kbdus[scancode];
+
+            if (key)
+                terminal_putchar(key);
+        }
+    }
+}
 
 /**
- * Handle pressed keys (display character or move cursor).
- */
-void handle_key(void)
+* Handle incoming scancodes.
+*/
+void process_scancodes(void)
 {
     const unsigned char status_flags = inb(PS2_STATUS_REGISTER);
     const unsigned char input_buffer_status = status_flags & PS2_INPUT_STATUS_OFFSET;
@@ -69,18 +99,12 @@ void handle_key(void)
     if (buffer_is_full)
     {
         unsigned char scancode = inb(PS2_IO_PORT_DATA);
+        const bool is_extended_key = (scancode == KEY_ESCAPE_SEQ);
 
-        if (scancode == KEY_ESCAPE_SEQ)
-        {
+        if (is_extended_key)
             scancode = inb(PS2_IO_PORT_DATA);
-            handle_special_keys(scancode);
-        }
-        else
-        {
-            const char key = kbdus[scancode];
 
-            if (key)
-                terminal_putchar(key);
-        }
+        const bool is_pressed = ((scancode & 128) == 0);
+        handle_key(scancode, is_pressed, is_extended_key);
     }
 }

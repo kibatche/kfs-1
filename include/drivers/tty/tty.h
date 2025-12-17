@@ -29,7 +29,6 @@ int terminal_putchar(char c);
 size_t terminal_write(const char *str, size_t len);
 void terminal_init(void);
 
-void handle_special_keys(unsigned char scancode);
-void handle_key(void);
+void process_scancodes(void);
 
 #endif
