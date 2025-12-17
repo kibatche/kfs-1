@@ -11,7 +11,7 @@ ISO_DIR = iso
 LIBS = k gcc
 LIB_DIR = libk
 
-SRCS_C = kernel.c tty.c write.c
+SRCS_C = kernel.c tty.c write.c keyboard.c
 SRCS_AS = boot.asm
 
 OBJ_DIR = obj
