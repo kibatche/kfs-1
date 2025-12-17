@@ -43,8 +43,8 @@ void move_cursor(size_t offset_x, size_t offset_y)
 {
     size_t new_col_pos = col_pos + offset_x;
     size_t new_row_pos = row_pos + offset_y;
-    
-    if (new_col_pos < 0)  // TODO: fix
+
+    if (new_col_pos <= 0)
     {
         --new_row_pos;
         col_pos = VGA_WIDTH + new_col_pos;
