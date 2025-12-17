@@ -83,7 +83,6 @@ void terminal_update()
     {
         terminal_buff[((VGA_HEIGHT - 1) * VGA_WIDTH) + i] = vga_entry(' ', terminal_color);
     }
-
 }
 
 void terminal_set_color(uint8_t color)
@@ -94,17 +93,6 @@ void terminal_set_color(uint8_t color)
 void terminal_reset_color()
 {
     terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
-}
-
-void terminal_set_blank_spaces()
-{
-    for (size_t i = 0; i < VGA_WIDTH;i++)
-    {
-        for (size_t j = 0; j < VGA_HEIGHT; j++)
-        {
-            terminal_buff[i + (j * VGA_WIDTH);] = vga_entry(' ', terminal_color);
-        }
-    }
 }
 
 int terminal_putchar(char c)
@@ -134,9 +122,21 @@ size_t terminal_write(const char *str, size_t len)
     return (i);
 }
 
+void terminal_set_blank_spaces()
+{
+    for (int i = 0; i < VGA_WIDTH; i++)
+    {
+        for (int j = 0; j < VGA_HEIGHT; j++)
+        {
+            terminal_buff[i + (j * VGA_WIDTH)] = vga_entry(' ', terminal_color);
+        }
+    }
+}
+
 void terminal_init(void)
 {
     col_pos = 0;
     row_pos = 0;
     terminal_reset_color();
+    terminal_set_blank_spaces();
 }

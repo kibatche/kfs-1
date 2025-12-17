@@ -39,6 +39,7 @@ bool shift_on = false;
 
 static void handle_extended_key(unsigned char scancode, const bool is_pressed)
 {
+    (void)is_pressed;
     switch (scancode)
     {
     case SCANCODE_ARROW_UP:

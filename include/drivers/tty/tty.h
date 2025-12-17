@@ -28,12 +28,15 @@
 
 unsigned char inb(unsigned short port);
 void outb(unsigned char data, unsigned short port);
+
 void update_cursor(int x, int y);
 void move_cursor(int offset_x, int offset_y);
+
 void terminal_set_color(uint8_t color);
 void terminal_set_blank_spaces();
 void terminal_reset_color();
 int terminal_putchar(char c);
+void terminal_update();
 size_t terminal_write(const char *str, size_t len);
 void terminal_init(void);
 
