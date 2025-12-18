@@ -225,9 +225,7 @@ size_t terminal_write(const char *str, size_t len)
     size_t i = 0;
 
     while (str[i] && i < len)
-    {
         terminal_putchar(str[i++]);
-    }
     return (i);
 }
 
