@@ -37,6 +37,9 @@ CPPFLAGS =  -I ./include/drivers/video -I ./include/drivers/tty -I ./include/dri
 LDFLAGS = -T ./arch/i386/linker.ld -L./${LIB_DIR}
 LDLIBS = $(foreach lib, $(LIBS), -l$(lib))
 
+.PHONY: all
+all: install ${NAME_ISO}
+
 .PHONY: install
 install:
 	${MAKE} -C ${LIB_DIR}
@@ -53,7 +56,7 @@ ${OBJ_DIR}/%.o: %.asm
 ${NAME_BIN}: ${OBJ_DIR} ${OBJS}
 	${CC} ${CFLAGS} ${OBJS} ${LDFLAGS} ${LDLIBS} -o $@
 
-${NAME_ISO}:
+${NAME_ISO}: ${NAME_BIN}
 	@mkdir -p ${ISO_DIR}/boot/grub
 	@cp grub.cfg ${ISO_DIR}/boot/grub
 	@cp ${NAME_BIN} ${ISO_DIR}/boot
@@ -62,9 +65,6 @@ ${NAME_ISO}:
 .PHONY: run
 run:
 	@qemu-system-i386 -cdrom ${NAME_ISO}
-
-.PHONY: all
-all: install ${NAME_BIN} ${NAME_ISO}
 
 .PHONY: clean
 clean:
