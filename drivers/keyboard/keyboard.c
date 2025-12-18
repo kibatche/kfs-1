@@ -1,11 +1,4 @@
-#include <tty.h>
-#if defined(__linux__)
-    #error "Utilisation d'un cross-compiler obligatoire"
-#endif
-
-#if !defined(__i386__)
-    #error "Ce kernel doit etre compile en 32 bits."
-#endif
+#include <keyboard.h>
 
 /* Keyboard mappings. */
 const char kbdus[] = {

@@ -8,16 +8,18 @@
 #endif
 
 /**
- * variables globales pour le terminal et les differents calculs
+ * Global structs that contain information about terminals
+ * Number of the active terminal
 **/
-// size_t col_pos;
-// size_t row_pos;
-// uint8_t terminal_color;
-// uint16_t *terminal_buff = (uint16_t *)VGA_MEMORY;
-
 tty terminals[MAX_TERM];
 size_t active_term = 0;
 
+/**
+ * @brief Do the inb op on a given port
+ * 
+ * @param port 
+ * @return unsigned char 
+ */
 unsigned char inb(unsigned short port)
 {
     unsigned char result;
@@ -26,11 +28,23 @@ unsigned char inb(unsigned short port)
     return (result);
 }
 
+/**
+ * @brief Do the out op on a given port with the value data
+ * 
+ * @param port 
+ * @return unsigned char 
+ */
 void outb(unsigned char data, unsigned short port)
 {
     __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
+/**
+ * @brief Update the cursor by adding x and/or y to its position
+ * 
+ * @param x 
+ * @param y 
+ */
 static void update_cursor(int x, int y)
 {
     uint16_t pos = x + (y * VGA_WIDTH);
@@ -41,6 +55,10 @@ static void update_cursor(int x, int y)
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_PORT_DATA);
 }
 
+/**
+ * @brief Update the terminal when scrolling
+ * 
+ */
 static void terminal_update()
 {
     for (size_t row = 0; row < VGA_HEIGHT - 1; row++)
@@ -56,6 +74,12 @@ static void terminal_update()
     }
 }
 
+/**
+ * @brief put a char c in the VGA_MEMORY
+ * 
+ * @param c 
+ * @return int 
+ */
 int terminal_putchar(char c)
 {
     const bool is_newline = (c == '\n');
@@ -72,6 +96,11 @@ int terminal_putchar(char c)
     return (1);
 }
 
+/**
+ * @brief Set blank space on the terminal
+ * 
+ * @param term 
+ */
 static void terminal_set_blank_spaces(tty *term)
 {
     for (int i = 0; i < VGA_WIDTH; i++)
@@ -84,6 +113,10 @@ static void terminal_set_blank_spaces(tty *term)
     }
 }
 
+/**
+ * @brief Save the content of the active terminal before switching to another one
+ * 
+ */
 static void terminal_save_content()
 {
     for (size_t i  = 0; i < (VGA_WIDTH * VGA_HEIGHT); i++)
@@ -92,6 +125,11 @@ static void terminal_save_content()
     }
 }
 
+/**
+ * @brief Put the saved content from a terminal to the VGA video memory
+ * after switching
+ *
+ */
 static void terminal_put_saved_content()
 {
     for (size_t i  = 0; i < (VGA_WIDTH * VGA_HEIGHT); i++)
@@ -100,6 +138,11 @@ static void terminal_put_saved_content()
     }
 }
 
+/**
+ * @brief Switch to terminal number term_number + 1
+ * 
+ * @param term_number 
+ */
 void terminal_switch(size_t term_number)
 {
     if (term_number != active_term && term_number + 1 <= MAX_TERM)
@@ -111,6 +154,12 @@ void terminal_switch(size_t term_number)
     }
 }
 
+/**
+ * @brief Move the cursor to a given offset x and y
+ * 
+ * @param offset_x 
+ * @param offset_y 
+ */
 void move_cursor(int offset_x, int offset_y)
 {
     int new_col_pos = terminals[active_term].col_pos + offset_x;
@@ -145,16 +194,32 @@ void move_cursor(int offset_x, int offset_y)
     update_cursor(terminals[active_term].col_pos, terminals[active_term].row_pos);
 }
 
+/**
+ * @brief Set the terminal color to color
+ * 
+ * @param color 
+ */
 void terminal_set_color(uint8_t color)
 {
     terminals[active_term].terminal_color = color;
 }
 
+/**
+ * @brief Reset the terminal color to white letter on black background
+ * 
+ */
 void terminal_reset_color()
 {
     terminals[active_term].terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
+/**
+ * @brief Write a string to the terminal
+ * 
+ * @param str 
+ * @param len 
+ * @return size_t 
+ */
 size_t terminal_write(const char *str, size_t len)
 {
     size_t i = 0;
@@ -166,6 +231,10 @@ size_t terminal_write(const char *str, size_t len)
     return (i);
 }
 
+/**
+ * @brief Init terminals before using them
+ * 
+ */
 void terminal_init(void)
 {
     for (size_t i = 0; i < MAX_TERM; i++)

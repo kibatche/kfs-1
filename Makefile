@@ -18,21 +18,21 @@ OBJ_DIR = obj
 OBJ_FILES = ${SRCS_C:.c=.o} ${SRCS_AS:.asm=.o}
 OBJS = $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
 
-VPATH = arch/i386/boot drivers/tty kernel fs
+VPATH = arch/i386/boot drivers/tty drivers/keyboard kernel fs
 
 AS = nasm
 ASFLAGS = -f elf
 
 CC = i386-elf-gcc
 #-02 : opitmisation; -g: debug
-CFLAGS = -O2 -g
-CFLAGS += -Wall -Wextra
+CFLAGS = -O2
+CFLAGS += -Wall -Wextra -Werror
 #-std=gnu99: standard C gnu99; -ffreestanding : pas de std et point d'entree pas forcement main
 CFLAGS += -std=gnu99 -ffreestanding
 #-fno-builtin: pas de remplacement de fonction par des versions GCC ; -fno-stack-protector: pas de protection de la stack
 CFLAGS += -fno-builtin -fno-stack-protector
 CFLAGS += -nostdlib -nodefaultlibs
-CPPFLAGS =  -I ./include/drivers/video -I ./include/fs -I ./include/drivers/tty -I ./libk/include -I ./arch/i386/include
+CPPFLAGS =  -I ./include/drivers/video -I ./include/drivers/tty -I ./include/drivers/keyboard -I ./include/fs -I ./libk/include -I ./arch/i386/include
 
 LDFLAGS = -T ./arch/i386/linker.ld -L./${LIB_DIR}
 LDLIBS = $(foreach lib, $(LIBS), -l$(lib))
