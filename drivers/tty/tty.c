@@ -10,10 +10,13 @@
 /**
  * variables globales pour le terminal et les differents calculs
 **/
-size_t col_pos;
-size_t row_pos;
-uint8_t terminal_color;
-uint16_t *terminal_buff = (uint16_t *)VGA_MEMORY;
+// size_t col_pos;
+// size_t row_pos;
+// uint8_t terminal_color;
+// uint16_t *terminal_buff = (uint16_t *)VGA_MEMORY;
+
+tty terminals[MAX_TERM];
+size_t active_term = 0;
 
 unsigned char inb(unsigned short port)
 {
@@ -28,7 +31,7 @@ void outb(unsigned char data, unsigned short port)
     __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
-void update_cursor(int x, int y)
+static void update_cursor(int x, int y)
 {
     uint16_t pos = x + (y * VGA_WIDTH);
 
@@ -38,61 +41,19 @@ void update_cursor(int x, int y)
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_PORT_DATA);
 }
 
-void move_cursor(int offset_x, int offset_y)
-{
-    int new_col_pos = col_pos + offset_x;
-    int new_row_pos = row_pos + offset_y;
-
-    if (new_col_pos < 0)
-    {
-        --new_row_pos;
-        col_pos = VGA_WIDTH + new_col_pos;
-    }
-    else if (new_col_pos >= VGA_WIDTH)
-    {
-        ++new_row_pos;
-        col_pos = new_col_pos - VGA_WIDTH;
-    }
-    else
-    {
-        col_pos = new_col_pos;
-    }
-
-    if ((new_row_pos >= 0) && (new_row_pos < VGA_HEIGHT))
-    {
-        row_pos = new_row_pos;
-    }
-    
-    if (new_row_pos == VGA_HEIGHT)
-    {
-        row_pos = VGA_HEIGHT - 1;
-        terminal_update();
-    }
-    
-    update_cursor(col_pos, row_pos);
-}
-
-void terminal_update()
+static void terminal_update()
 {
     for (size_t row = 0; row < VGA_HEIGHT - 1; row++)
     {
-        memcpy(&terminal_buff[row * VGA_WIDTH], &terminal_buff[(row + 1) * VGA_WIDTH], VGA_WIDTH * sizeof(uint16_t));
+        memcpy(&terminals[active_term].terminal_buff[row * VGA_WIDTH], \
+            &terminals[active_term].terminal_buff[(row + 1) * VGA_WIDTH], \
+            VGA_WIDTH * sizeof(uint16_t));
     }
 
     for (size_t i = 0; i < VGA_WIDTH; i++)
     {
-        terminal_buff[((VGA_HEIGHT - 1) * VGA_WIDTH) + i] = vga_entry(' ', terminal_color);
+        terminals[active_term].terminal_buff[((VGA_HEIGHT - 1) * VGA_WIDTH) + i] = vga_entry(' ', terminals[active_term].terminal_color);
     }
-}
-
-void terminal_set_color(uint8_t color)
-{
-    terminal_color = color;
-}
-
-void terminal_reset_color()
-{
-    terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 int terminal_putchar(char c)
@@ -101,15 +62,98 @@ int terminal_putchar(char c)
 
     if (is_newline)
     {
-        col_pos = 0;
+        terminals[active_term].col_pos = 0;
         move_cursor(0, 1);
         return (0);
     }
-    const size_t idx = col_pos + (row_pos * VGA_WIDTH);
-    terminal_buff[idx] = vga_entry(c, terminal_color);
+    const size_t idx = terminals[active_term].col_pos + (terminals[active_term].row_pos * VGA_WIDTH);
+    terminals[active_term].terminal_buff[idx] = vga_entry(c, terminals[active_term].terminal_color);
     move_cursor(1, 0);
     return (1);
- }
+}
+
+static void terminal_set_blank_spaces(tty *term)
+{
+    for (int i = 0; i < VGA_WIDTH; i++)
+    {
+        for (int j = 0; j < VGA_HEIGHT; j++)
+        {
+            term->terminal_buff[i + (j * VGA_WIDTH)] = vga_entry(' ', term->terminal_color);
+            term->saved_term_content[i + (j * VGA_WIDTH)] = vga_entry(' ', term->terminal_color);
+        }
+    }
+}
+
+static void terminal_save_content()
+{
+    for (size_t i  = 0; i < (VGA_WIDTH * VGA_HEIGHT); i++)
+    {
+        terminals[active_term].saved_term_content[i] = terminals[active_term].terminal_buff[i];
+    }
+}
+
+static void terminal_put_saved_content()
+{
+    for (size_t i  = 0; i < (VGA_WIDTH * VGA_HEIGHT); i++)
+    {
+        terminals[active_term].terminal_buff[i] = terminals[active_term].saved_term_content[i];
+    }
+}
+
+void terminal_switch(size_t term_number)
+{
+    if (term_number != active_term && term_number + 1 <= MAX_TERM)
+    {
+        terminal_save_content();
+        active_term = term_number;
+        terminal_put_saved_content();
+        update_cursor(terminals[active_term].col_pos, terminals[active_term].row_pos);
+    }
+}
+
+void move_cursor(int offset_x, int offset_y)
+{
+    int new_col_pos = terminals[active_term].col_pos + offset_x;
+    int new_row_pos = terminals[active_term].row_pos + offset_y;
+
+    if (new_col_pos < 0)
+    {
+        --new_row_pos;
+        terminals[active_term].col_pos = VGA_WIDTH + new_col_pos;
+    }
+    else if (new_col_pos >= VGA_WIDTH)
+    {
+        ++new_row_pos;
+        terminals[active_term].col_pos = new_col_pos - VGA_WIDTH;
+    }
+    else
+    {
+        terminals[active_term].col_pos = new_col_pos;
+    }
+
+    if ((new_row_pos >= 0) && (new_row_pos < VGA_HEIGHT))
+    {
+        terminals[active_term].row_pos = new_row_pos;
+    }
+    
+    if (new_row_pos == VGA_HEIGHT)
+    {
+        terminals[active_term].row_pos = VGA_HEIGHT - 1;
+        terminal_update();
+    }
+
+    update_cursor(terminals[active_term].col_pos, terminals[active_term].row_pos);
+}
+
+void terminal_set_color(uint8_t color)
+{
+    terminals[active_term].terminal_color = color;
+}
+
+void terminal_reset_color()
+{
+    terminals[active_term].terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+}
 
 size_t terminal_write(const char *str, size_t len)
 {
@@ -122,21 +166,14 @@ size_t terminal_write(const char *str, size_t len)
     return (i);
 }
 
-void terminal_set_blank_spaces()
-{
-    for (int i = 0; i < VGA_WIDTH; i++)
-    {
-        for (int j = 0; j < VGA_HEIGHT; j++)
-        {
-            terminal_buff[i + (j * VGA_WIDTH)] = vga_entry(' ', terminal_color);
-        }
-    }
-}
-
 void terminal_init(void)
 {
-    col_pos = 0;
-    row_pos = 0;
-    terminal_reset_color();
-    terminal_set_blank_spaces();
+    for (size_t i = 0; i < MAX_TERM; i++)
+    {
+        terminals[i].col_pos = 0;
+        terminals[i].row_pos = 0;
+        terminals[i].terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+        terminals[i].terminal_buff = (uint16_t *)VGA_MEMORY;
+        terminal_set_blank_spaces(&terminals[i]);
+    }
 }

@@ -88,8 +88,17 @@ static void handle_key(unsigned char scancode, const bool is_pressed, const bool
         }
         else if ((scancode == SCANCODE_F1) || (scancode == SCANCODE_F2))
         {
-            // TODO
-            ;
+            switch(scancode)
+            {
+                case SCANCODE_F1:
+                    terminal_switch(0);
+                    break;
+                case SCANCODE_F2:
+                    terminal_switch(1);
+                    break;
+                default:
+                    return;
+            }
         }
         else
         {

@@ -13,6 +13,9 @@
 #define PS2_STATUS_REGISTER 0x64
 #define PS2_INPUT_STATUS_OFFSET 0x1
 
+// maximum allowed terminal
+#define MAX_TERM 2
+
 #define KEY_ESCAPE_SEQ 0xE0
 #define KEY_PRESSED_MASK 0x80
 #define SCANCODE_CAPSLOCK 0x3a
@@ -26,19 +29,29 @@
 #define SCANCODE_F1 0x3b
 #define SCANCODE_F2 0x3c
 
+typedef struct tty
+{
+    size_t col_pos;
+    size_t row_pos;
+    uint8_t terminal_color;
+    uint16_t *terminal_buff;
+    uint16_t saved_term_content[VGA_WIDTH * VGA_HEIGHT];
+}               tty;
+
 unsigned char inb(unsigned short port);
 void outb(unsigned char data, unsigned short port);
 
-void update_cursor(int x, int y);
-void move_cursor(int offset_x, int offset_y);
+void terminal_init(void);
 
 void terminal_set_color(uint8_t color);
-void terminal_set_blank_spaces();
 void terminal_reset_color();
+
 int terminal_putchar(char c);
-void terminal_update();
 size_t terminal_write(const char *str, size_t len);
-void terminal_init(void);
+
+void terminal_switch(size_t term_number);
+
+void move_cursor(int offset_x, int offset_y);
 
 void process_scancodes(void);
 
