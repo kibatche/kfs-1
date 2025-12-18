@@ -49,9 +49,9 @@ static void update_cursor(int x, int y)
 {
     uint16_t pos = x + (y * VGA_WIDTH);
 
-    outb(0x0F, VGA_PORT_INDEX);
+    outb(LOW_BYTE_INDEX, VGA_PORT_INDEX);
     outb((uint8_t) (pos & 0xFF), VGA_PORT_DATA);
-    outb(0x0E, VGA_PORT_INDEX);
+    outb(HIGH_BYTE_INDEX, VGA_PORT_INDEX);
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_PORT_DATA);
 }
 
