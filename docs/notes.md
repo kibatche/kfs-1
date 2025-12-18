@@ -15,6 +15,7 @@ This document is a notepad.
 - [Implementing the kernel](#implementing-the-kernel)
 - [Linking the Kernel](#linking-the-kernel)
 - [Booting the Kernel](#booting-the-kernel)
+- [Resources](#resources)
 
 ## Context
 
@@ -235,3 +236,13 @@ Since we don't want to restart our virtual machine and boot our OS every time we
 ```sh
 qemu-system-i386 -cdrom uselOS.iso
 ```
+
+## Resources
+
+- [Text Mode Cursor](https://wiki.osdev.org/Text_Mode_Cursor)
+- [Operating Systems Development - System Architecture](https://brokenthorn.com/Resources/OSDev7.html)
+- [Interrupt request](https://en.wikipedia.org/wiki/Interrupt_request)
+- [Keyboard scancodes](https://aeb.win.tue.nl/linux/kbd/scancodes-1.html)
+- [Scancodes C arrays](https://f.osdev.org/viewtopic.php?p=310348&sid=4a20bdf2ac22b71256fac50c1fd8d439#p310348) (The `I/O SubSystem` chapter)
+- [x86 Instruction Set Reference: IN](https://c9x.me/x86/html/file_module_x86_id_139.html)
+- [x86 Instruction Set Reference: OUT](https://c9x.me/x86/html/file_module_x86_id_222.html)
