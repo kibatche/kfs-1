@@ -66,8 +66,8 @@ static void handle_key(unsigned char scancode, const bool is_pressed, const bool
     else if (
         (scancode == SCANCODE_LSHIFT) \
         || (scancode == SCANCODE_RSHIFT) \
-        || ((scancode ^ PRESSED_KEY_MASK) == SCANCODE_LSHIFT) \
-        || ((scancode ^ PRESSED_KEY_MASK) == SCANCODE_RSHIFT)
+        || ((scancode ^ KEY_PRESSED_MASK) == SCANCODE_LSHIFT) \
+        || ((scancode ^ KEY_PRESSED_MASK) == SCANCODE_RSHIFT)
     )
     {
         shift_on = is_pressed;
@@ -121,15 +121,12 @@ void process_scancodes(void)
     if (buffer_is_full)
     {
         unsigned char scancode = inb(PS2_IO_PORT_DATA);
-        const bool is_extended_key = (scancode == SCANCODE_EXTENDED_KEY);
-        // Keys that were not present on standard keyboards have extended scancodes
-        // (e.g., home, page up, page down, del, ctrl, alt, shift, ...).
-        // They generate two different interrupts: the first containing the E0 byte,
-        // the second containing the scancode.
+        const bool is_extended_key = (scancode == KEY_ESCAPE_SEQ);
+
         if (is_extended_key)
             scancode = inb(PS2_IO_PORT_DATA);
 
-        const bool is_pressed = ((scancode & PRESSED_KEY_MASK) == 0);
+        const bool is_pressed = ((scancode & KEY_PRESSED_MASK) == 0);
         handle_key(scancode, is_pressed, is_extended_key);
     }
 }
