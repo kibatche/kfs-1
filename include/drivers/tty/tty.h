@@ -1,19 +1,19 @@
 #ifndef TTY_H
 # define TTY_H
 
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
-#include <vga.h>
+# include <stddef.h>
+# include <stdbool.h>
+# include <stdint.h>
+# include <string.h>
+# include <vga.h>
 
-#define VGA_PORT_INDEX 0x3D4
-#define VGA_PORT_DATA 0x3D5
-#define LOW_BYTE_INDEX 0x0F
-#define HIGH_BYTE_INDEX 0x0E
+# define VGA_PORT_INDEX 0x3D4
+# define VGA_PORT_DATA 0x3D5
+# define LOW_BYTE_INDEX 0x0F
+# define HIGH_BYTE_INDEX 0x0E
 
 // maximum allowed terminal
-#define MAX_TERM 2
+# define MAX_TERM 2
 
 typedef struct tty
 {

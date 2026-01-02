@@ -46,4 +46,3 @@ _start:
 .halt:  hlt; met le kernel dans un etat en suspension
 	jmp .halt; loop infinie dans l'etat en suspension
 .end:
-
